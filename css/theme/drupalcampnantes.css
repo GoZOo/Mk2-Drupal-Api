@@ -1,0 +1,72 @@
+/*********************************************
+ * LINKS
+ *********************************************/
+.reveal a {
+  color: #f9a919;
+}
+
+.reveal a:hover {
+  color: #f9a919;
+}
+
+.reveal .slides > section.drupalcampnantes-intro  {
+  padding-left: 4em;
+  text-align: left;
+  height: 100%;
+}
+
+section.drupalcampnantes-intro h1 {
+  position: absolute;
+  top: -2em;
+  font-size: 1.5em;
+}
+
+section.drupalcampnantes-intro h2 {
+  position: absolute;
+  bottom: 8em;
+  font-size: 0.8em;
+  text-transform: none;
+  font-style: italic;
+  font-weight: normal;
+}
+section.drupalcampnantes-intro p.function {
+  bottom: 8em;
+  position: absolute;
+}
+section.drupalcampnantes-intro h2:before {
+  content: "";
+  width: 65px;
+  height: 8px;
+  background: #f9a919;
+  position: absolute;
+  top: -50px;
+}
+
+footer .branding--logo {
+  display: inline-block;
+  float: left;
+  margin-left: 1em;
+  font-size: 0.5em;
+  position: absolute;
+  bottom: 0em;
+}
+footer .logo__image {
+  display: inline-block;
+  vertical-align: middle;
+}
+footer .logo__site-name {
+  display: inline-block;
+}
+
+footer .session--info {
+  display: inline-block;
+  float: right;
+  font-size: 0.5em;
+  position: absolute;
+  bottom: 0em;
+  right: 5em;
+}
+footer .session__title, footer .session__presenter {
+  display: inline-block; 
+}
+

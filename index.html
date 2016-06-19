@@ -1,0 +1,586 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Retour d'expérience - création d'une API avec Drupal pour MK2.com</title>
+
+		<link rel="shortcut icon" href="lib/image/favicon.ico" />
+		<meta name="description" content="Retour d'expérience - création d'une API avec Drupal pour MK2.com">
+		<meta name="author" content="Fabien Clément">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+		<link rel="stylesheet" href="css/theme/drupalcampnantes.css">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<footer>
+	            <div class="branding--logo">
+	                <span class="logo__image"><img src="lib/image/commerceguys_by_actualys.png" alt="Commerce Guys by Actualys" /></span>
+	                <span class="logo__image"><img src="lib/image/logo.png" alt="Drupal Camp Nantes 2016 logo" height="55px"></span>
+	                <p class="logo__site-name">#dcnantes</p>
+	            </div>
+	            <div class="session--info">
+	                <p class="session__title">Retour d'expérience - création d'une API avec Drupal pour MK2.com <span class="seperator">&nbsp;/&nbsp;</span></p>
+	                <p class="session__presenter">@asplamagnifique & @GozOo</p>
+	            </div>
+	        </footer>
+			<div class="slides">
+				<section class="drupalcampnantes-intro" data-background="lib/image/background.jpg">
+					<h1>Retour d'expérience - création d'une API avec Drupal pour MK2.com.</h1>
+					<h2 style="background: #000000;">Anne-Sophie Picot - @asplamagnifique<br />Fabien Clément - @GozOo</h2>
+                    <p class="function">
+                        <small>Par <a href="https://twitter.com/commerceguys">@CommerceGuys</a> by <a href="https://twitter.com/actualys">@actualys</a></small>
+                    </p>
+				</section>
+
+				<section>
+                    <section>
+                        <h2>Ce que l'on va voir</h2>
+                        <ul>
+                          <li class="fragment">MK2.com</li>
+                          <li class="fragment">Etat de l'art API V2</li>
+                          <li class="fragment">Objectifs V3</li>
+                          <li class="fragment">Réalisation</li>
+                          <li class="fragment">Problèmes et résolutions liées à Drupal (ou non)</li>
+                          <li class="fragment">Aujourd'hui</li>
+                          <li class="fragment">Demain</li>
+                          <li class="fragment">Conclusion</li>
+                        </ul>
+                    </section>
+                </section>
+
+				<section>
+                    <section>
+                        <h2>MK2.com</h2>
+
+                        <p>Site développé avec Drupal et Drupal Commerce en 2013 par Commerce Guys.</p>
+						<p>Présente l'ensemble des salles parisiennes du groupe et permet de réserver en ligne leurs séances.</p>
+                    </section>
+                    <section>
+                        <h2>MK2.com</h2>
+
+                        <p>Les fonctionnalités du site:</p>
+						<ul>
+							<li class="fragment">Salles du groupe MK2</li>
+							<li class="fragment">Séances de films et d'événements, réservables ou non</li>
+							<li class="fragment">Parcours d'achat</li>
+							<li class="fragment">Achat et utilisation de cartes de réservations online/irl</li>
+							<li class="fragment">Solution de paiement intégrée</li>
+							<li class="fragment">API V2 limitée pour application mobile tiers hybride.</li>
+							<li class="fragment">Connexion à un système tiers pour la synchronisation des données métier (salles, films, seances, prix, cartes etc) et de réservation.</li>
+						</ul>
+                    </section>
+                </section>
+
+				<section>
+                    <section>
+                        <h2>Etat de l'art API V2</h2>
+
+                        <p>Mis en place avec plusieurs modules contrib : tels que Services et Views et échange en JSON en se basant sur REST.</p>
+						<ul>
+							<li class="fragment">L'API V2 ne donne pas accès à l'ensemble des données disponibles sur le site
+							  <ul>
+							    <li class="fragment">pas d'événements</li>
+							    <li class="fragment">pas de recherche</li>
+							    <li class="fragment">pas de contenu lié aux utilisateurs: carte, historique, reservation, données utilisateur).</li>
+							  </ul>
+							</li>
+						</ul>
+                    </section>
+                    <section>
+                        <h2>Etat de l'art API V2</h2>
+						<ul>
+							<li>L'API V2 ne permet pas d'effectuer de réservation.</li>
+							<li class="fragment">L'API V2 manque de finesse dans la segmentation des droits d'accès aux données.</li>
+							<li class="fragment">L'API V2 n'est pas optimisée.</li>
+							<li class="fragment">L'API V2 produit des contenus non standardisés suivant les différentes ressources.</li>
+						</ul>
+                    </section>
+
+                    <section>
+                        <h3>Requêtes et traitements inutiles</h3>
+						<ul>
+							<li class="fragment">À minima une requête pour lister les données souhaitées.</li>
+							<li class="fragment">Appelle d’une vue par donnée à afficher, à savoir qu’une vue est stockée en base de données. Nous avons donc:
+							<ul>
+								<li>chargement de la configuration de la vue</li>
+								<li>chargement de l’objet de la donnée.</li>
+							</ul>
+							<li class="fragment">Génération au format json du résultat par chacune de ces vues.</li>
+						</ul>
+                    </section>
+                    <section>
+                        <h3>Requêtes et traitements inutiles</h3>
+						<ul>
+							<li>Décodage du json en variables PHP pour chacune des données.</li>
+							<li class="fragment">Envoi de la liste des données en PHP au module services.</li>
+							<li class="fragment">Encodage en json des données par le module services pour envoi à l’application tiers.</li>
+							<li class="fragment">Aucun cache.</li>
+						</ul>
+                    </section>
+                    <section>
+						<image src="lib/image/schema-api-v2.png" alt="Schema fonctionnement API V2 MK2.com" style="background: #ffffff; margin-top: -1em" />
+                    </section>
+                    <section>
+						<image src="lib/image/schema-api-v2-2.png" alt="Schema 2 fonctionnement API V2 MK2.com" style="background: #ffffff; margin-top: -1em" />
+                    </section>
+
+                    <section>
+                        <h3>Problème de standardisation</h3>
+                        <ul>
+                          <li class="fragment">Résultat dans des tableaux de tableaux ou dans un tableau unique suivant les requêtes.</li>
+                          <li class="fragment">Pas de consistance dans l'affichage des objets suivant les appels.</li>
+                          <li class="fragment">Pas de règles définies.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>Listing des films</h4>
+						<pre><code style="word-wrap: break-word;">
+[
+  [
+    {
+      "nid": "123",
+      "épinglé": "0",
+      "title": "Demain",
+      ...
+    },
+    {
+      "nid": "456",
+      "épinglé": "1",
+      "title": "Hier",
+      ...
+    },
+    ...
+  ]
+]
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h4>Affichage d'un film</h4>
+						<pre><code style="word-wrap: break-word;">
+[
+	{
+	  "nid": "123",
+	  "épinglé": "0",
+	  "title": "Demain",
+	  ...
+	}
+]
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h4>Listing des séances</h4>
+						<pre><code style="word-wrap: break-word;">
+[
+  [
+    {
+      "seance_id": "123",
+      "seance_date": "06/09/2016 - 00:00",
+      "seance_visa": "140040",
+      ...
+    },
+    {
+      "seance_id": "124",
+      "seance_date": "07/09/2016 - 00:00",
+      "seance_visa": "140041",
+      ...
+    },
+    ...
+  ]
+]
+                        </code></pre>
+                    </section>
+                </section>
+
+				<section>
+                    <section>
+                        <h2>Objectifs V3</h2>
+
+                        <p>Les 3 objectifs que nous nous sommes fixés pour la mise en place de ces nouvelle API sont: 	</p>
+						<ul>
+							<li class="fragment"><strong>La sécurité</strong>: l’accès aux différents services doit être sécurisé et administrable facilement.</li>
+							<li class="fragment"><strong>La standardisation</strong>: l’ensemble des services doit utiliser une logique et une syntaxe similaire afin d’être utilisable par des interlocuteurs variés.</li>
+							<li class="fragment"><strong>L’évolutivité</strong>: l’API mk2 doit être conçue comme un produit permettant d’intégrer les versions antérieures et de faciliter la mise en place des évolutions à venir.</li>
+						</ul>
+                    </section>
+                    <section>
+                        <h3>Étude et choix de la solution</h3>
+
+						<ul>
+							<li class="fragment">Le site fournit toujours l’api avec drupal.</li>
+							<li class="fragment">Création d'une nouvelle version en conservant la v2 fonctionnelle sans conflit.</li>
+							<li class="fragment">Conserver l’utilisation du module services.</li>
+							<li class="fragment">Création d’un nouveau service (v3) utilisant des ressources sans lien avec les ressources du service précédent (v2).</li>
+						</ul>
+                    </section>
+                    <section>
+                        <h3>Étude et choix de la solution</h3>
+
+						<ul>
+							<li>Remplacement de views pour la génération en json par la création d’objets PHP pouvant être sérialisés.</li>
+							<li class="fragment">Sérialisation seulement lors de la réponse.</li>
+							<li class="fragment">Toutes les réponses doivent se faire en json dans un format défini et consistant.</li>
+						</ul>
+                    </section>
+                    <section>
+                        <h3>Méthode</h3>
+
+						<p>Ce projet comportait la complexité de devoir être mené en parallèle du développement d’une nouvelle application iOS. Cette coordination de 2 projets a nécessité :</p>
+						<ul>
+							<li class="fragment">La création d’une documentation technique collaborative sur GitHub entre les développeurs Drupal et les développeurs mobiles.</li>
+							<li class="fragment">Un point quotidien avec l’ensemble des acteurs des deux projets.</li>
+							<li class="fragment">Un planning des tâches et des priorités mixant les deux projets et mis à jour au quotidien.</li>
+						</ul>
+                    </section>
+                    
+                    <section>
+                        <h3>Solutions techniques utilisées</h3>
+                    </section>
+
+                    <section>
+                        <h4>Création d'un module contrib Services API Keys Authentication (services_auth_apikeys)</h4>
+						<p>Ce module permet de définir des clés d'authentifications liées à un utilisateur drupal.</p>
+
+						<ul>
+							<li class="fragment">Les utilisateurs seront alors attachés à un rôle Drupal.</li>
+							<li class="fragment">Dans l'interface des ressources, il est possible de restreindre l'accès aux ressources par rôles.</li>
+							<li class="fragment">Ces utilisateurs drupal seront dissociables des utilisateurs connectés et peuvent donc uniquement être utilisés pour savoir quelle application est en train de se connecter au webservice et si elle a le droit d'accéder à l'une ou l'autre des ressources.</li>
+						</ul>
+                    </section>
+
+                    <section>
+                        <img src="lib/image/schema-apikeys.png" alt="Schéma Services API Keys Authentication" style="background: #ffffff; margin: -1em;" />
+                    </section>
+
+                    <section>
+                        <h4>Création d'un module contrib Services session Token Authentication (services_session_token_auth)</h4>
+						<ul>
+							<li class="fragment">Ce module permet de connecter un utilisateur en se basant sur un couple de clés (tokens) envoyés en en-tête http et de ne pas prendre en compte les éventuelles cookies de session.</li>
+							<li class="fragment">Lors de sa première connexion via son application, l'utilisateur reçoit un couple de clés qui lui permettra de se connecter ensuite avec son utilisateur sans devoir renvoyer son identifiant et son mot de passe.</li>
+							<li class="fragment">Le mot de passe de l'utilisateur n'a pas à être stocké dans l'application.</li>
+						</ul>
+                    </section>
+
+                    <section>
+                        <h4>Standardisation des résultats</h4>
+						<p>Les requêtes sont toujours construites directement dans la ressource:</p>
+						<pre><code style="word-wrap: break-word;">
+/**
+ * Gets an event encoded in JSON.
+ *
+ * @param int $id
+ *   Id of the event.
+ * @param string $includes
+ *   The objects this object should return.
+ *
+ * @return
+ *   Returns null if the event doesn't exist or the JSON encoded node.
+ */
+function _events_resource_retrieve($nid, $includes) {
+  if ($node = node_load($nid)) {
+    $node_wrapper = entity_metadata_wrapper('node', $node);
+    $includes = _mk2_webservices3_get_includes_as_array($includes);
+    _mk2_webservices3_validate_includes($includes, array('movies'));
+
+    $out = new Mk2Webservices3Event($node_wrapper, $includes);
+  }
+  else {
+    $message = t('The event !nid does not exist!', array('!nid' => $nid));
+    services_error($message, 404, array(
+        'error' => $message,
+        'error_node' => 'events.not_found'
+      ));
+    return NULL;
+  }
+
+  return array('event' => $out);
+}
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h4>Standardisation des résultats</h4>
+						<p>Le json est généré à partir d'objets (classes)</p>
+						<pre><code style="word-wrap: break-word;">
+class Mk2Webservices3Event implements JsonSerializable {
+
+  /**
+   * Constructor.
+   */
+  public function __construct($wrapper, $includes = array(), $data = array()) {
+  	// ...
+  }
+
+  // Getters/setters
+  // ...
+
+  /**
+   * function called when encoded with json_encode.
+   *
+   * @return array
+   */
+  public function jsonSerialize()
+  {
+    return get_object_vars($this);
+  }
+}
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h4>Standardisation des erreurs</h4>
+						<p>Utilisation de la méthode services_error() du module services pour générer des erreurs:</p>
+						<pre><code style="word-wrap: break-word;">
+$message = t('The event !nid does not exist!', array('!nid' => $nid));
+services_error($message, 404, array(
+  'error' => $message,
+  'error_code' => 'events.not_found'
+));
+                        </code></pre>
+                    
+                    	<div class="fragment">
+							<p>Ce qui affiche:</p>
+							<pre><code style="word-wrap: break-word;">
+	{
+		"error": "The event 123456 does not exist!",
+		"error_code": "events.not_found"
+	}
+	                        </code></pre>
+	                    </div>
+                    </section>
+
+                    <section>
+                        <h4>Standardisation des erreurs</h4>
+						<p>Utilisation d'une méthode générique pour formater les résultats de formulaires en erreur ce qui affichera:</p>
+						<pre><code style="word-wrap: break-word;">
+{
+	"error": "Field name is required. Birthday date cannot be in future.",
+	"error_code": "user.form.error",
+	"form_errors" {
+		"name": {
+			"error": "Field name is required.",
+			"error_code": "user.form.name",
+		},
+		"field_birthday": {
+			"error": "Birthday date cannot be in future.",
+			"error_code": "user.form.field_birthday",
+		}
+	}
+}
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h4>Standardisation des erreurs</h4>
+						<p>Utilisation du hook hook_rest_server_execute_errors_alter() pour surcharger les messages d'erreurs non gérés de manière à ce qu'ils suivent la structure souhaitée.</p>
+						<pre><code style="word-wrap: break-word;">
+/**
+ * Implements hook_rest_server_execute_errors_alter().
+ */
+function mk2_webservices3_rest_server_execute_errors_alter(&$error_alter_array, $controller, $arguments) {
+  if (!is_array($error_alter_array['body_data'])) {
+    $error_alter_array['body_data'] = array(
+      'error' => $error_alter_array['body_data'],
+      'error_code' => 'generic.error.' . $error_alter_array['code'],
+    );
+  }
+}
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h4>Sécurisation des échanges</h4>
+						<ul>
+						  <li>Tous les échanges envoyés et reçus pour et par les webservices doivent désormais se faire par SSL.</li>
+						  <li>Accès aux ressources limitées par authentification de clé par application.</li>
+						</ul>
+                    </section>
+
+                    <section>
+                        <h4>Gestion du cache</h4>
+						<ul>
+							<li class="fragment">Mise en cache Drupal des résultats</li>
+							<li class="fragment">Utilisation de cache Varnish
+								<ul>
+									<li class="fragment">Le cache est affiné par authentification d'application.</li>
+									<li class="fragment">Le cache est affiné par utilisateur pour les ressources utilisateurs.</li>
+								</ul>
+							</li>
+						</ul>
+                    </section>
+                </section>
+
+
+                <section>
+	                <section>
+	                    <h2>Problèmes et résolutions liées à Drupal (ou non)</h2>
+						<ul>
+							<li class="fragment">Services module: Le module services ne permet pas une utilisation complète REST. Il ne permet pas par exemple les PUSH et est limité dans son approche de méthode/routing.</li>
+							<li class="fragment">Authentification d'application
+							  <ul>
+							    <li class="fragment">Aucun module ne permet d'avoir à la fois une authentification de l'application se connectant au service via des clés et une authentification utilisateur.</li>
+								<li class="fragment">Résolution via la création du module contrib <a href="http://drupal.org/project/services_auth_apikeys">services_auth_apikeys</a>.</li>
+							  </ul>
+							</li>
+						</ul>
+	                </section>
+	                <section>
+	                    <h2>Problèmes et résolutions liées à Drupal (ou non)</h2>
+						<ul>
+							<li>Authentification utilisateurs
+							  <ul>
+							    <li class="fragment">Ne pas prendre en compte les cookies comme un utilisateur authentifier mais se baser sur une authentification par clés uniquement.</li>
+							    <li class="fragment">Résolution via la création du module contrib <a href="http://drupal.org/project/services_session_token_auth">services_session_token_auth</a>.</li>
+							  </ul>
+							</li>
+						</ul>
+	                </section>
+	                <section>
+	                    <h2>Problèmes et résolutions liées à Drupal (ou non)</h2>
+						<ul>
+							<li>Erreurs textuelles générées non utilisables par des ws (ex commerce_stripe)
+							  <ul>
+							    <li class="fragment">Les erreurs sont généralement affichées directement via drupal_set_message() et ne sont pas retournées par les méthodes, ce qui est inutilisable pour des retours d'erreur par WS.</li>
+							  </ul>
+							</li>
+						</ul>
+	                </section>
+	                <section>
+	                    <h2>Problèmes et résolutions liées à Drupal (ou non)</h2>
+						<ul>
+							<li>Erreurs textuelles générées non utilisables par des ws (ex commerce_stripe)
+							  <ul>
+							    <li>Solutions: dans les cas possibles, patch du module pour retourner des messages dans les fonctions qui lèvent l'exception plutôt que d'afficher le message directement. Certains modules ne permettent pas cela, ce qui nécessitait un travail trop important pour le temps prévu.</li>
+							  </ul>
+							</li>
+						</ul>
+	                </section>
+                </section>
+
+
+                <section>
+	                <section>
+	                    <h2>Aujourd'hui</h2>
+	                </section>
+	                <section>
+	                    <h3>MK2 sur Allociné</h3>
+						<ul>
+							<li class="fragment">Le site Allociné.com exploite les API mk2 depuis le début de l'année 2016.</li>
+							<li class="fragment">Ses clés d'authentifications et son rôle lui permettent d'accéder uniquement au contenu. Il n'a donc pas accès aux données utilisateur, au processus d'achat, de paiement etc.</li>
+							<li class="fragment">Toutes les pages salles Mk2 du site Allociné sont servies par les API Mk2.</li>
+						</ul>
+	                </section>
+	                <section>
+	                    <img src="lib/image/mk2-api-allocine.png" alt="Capture intégration API MK2 sur Allociné" />
+	                </section>
+	                <section>
+	                    <h3>Application mobile iOS</h3>
+	                    <p>La version 3 de l’application iOS mk2 exploite plusieurs services des nouvelles API mk2</p>
+						<ul>
+							<li class="fragment">Recherche de contenu.</li>
+							<li class="fragment">Données utilisateurs.</li>
+							<li class="fragment">Transactions via différents moyen de paiement (cartes bancaires et cartes de cinéma prépayées).</li>
+						</ul>
+	                </section>
+	                <section>
+	                <p>L'accès à l’ensemble du parcours client (contenu > authentification > paiement) via API permet de garder l’utilisateur dans un environnement 100% natif iOS et donc de proposer une expérience utilisateur fluide.</p>
+	                    <img src="lib/image/mk2-api-ios-1.jpeg" alt="Capture intégration API MK2 dans application mobile iOS" style="width: 300px;"/>
+	                    <img src="lib/image/mk2-api-ios-2.jpeg" alt="Capture intégration API MK2 dans application mobile iOS" style="width: 300px;" />
+	                    <img src="lib/image/mk2-api-ios-3.jpeg" alt="Capture intégration API MK2 dans application mobile iOS" style="width: 300px;" />
+	                </section>
+	                <section>
+	                	<p>Cette nouvelle application est disponible gratuitement sur l’Appstore.</p>
+	                    <img src="lib/image/mk2-api-ios.png" alt="Capture intégration API MK2 dans application mobile iOS" />
+	                </section>
+                </section>
+
+                <section>
+	                <section>
+	                    <h2>Demain</h2>
+	                    <p class="fragment">Sur le moyen-terme les API Drupal mk2 pourront permettre de développer:</p>
+						<ul>
+							<li class="fragment">Des logiciels (affichage d’informations, système de caisses... ).</li>
+							<li class="fragment">Des outils métiers (CRM, BI…).</li>
+							<li class="fragment">De nouvelles applications mobiles (Android).</li>
+							<li class="fragment">De nouveaux business model (affiliation, acquisition de trafic..).</li>
+						</ul>
+	                </section>
+                </section>
+
+                <section>
+	                <section>
+	                    <h2>Conclusion</h2>
+	                    <p class="fragment">Ce projet comportait de nombreux enjeux:</p>
+						<ul>
+							<li class="fragment">Rétro-compatibilité</li>
+							<li class="fragment">Sécurité.</li>
+							<li class="fragment">Délais</li>
+							<li class="fragment">Évolutivité.</li>
+						</ul>
+	                </section>
+	                <section>
+	                    <p class="fragment">et a pu être réalisé grâce à:</p>
+						<ul>
+							<li class="fragment">Un travail de conception poussé</li>
+							<li class="fragment">Une solution technique adaptée.</li>
+							<li class="fragment">Une gestion de projets que l’on pourrait qualifier d’agile</li>
+						</ul>
+	                </section>
+                </section>
+
+                <section>
+	                <h2 style="text-align: left; font-size: 1.2em;">{<br />&nbsp;&nbsp;error: "Merci",<br />
+	                &nbsp;&nbsp;error.code: "generique.de.fin",<br />}</h2>
+                </section>
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'socket.io/socket.io.js', async: true },
+					{ src: 'plugin/notes-server/client.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>
